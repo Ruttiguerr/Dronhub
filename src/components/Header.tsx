@@ -44,7 +44,8 @@ const Header: React.FC = () => {
           <nav className="hidden md:flex items-center space-x-4">
           {/* Brand dropdowns */}
             {Object.entries(brandGroups).map(([brand, list]) => (
-              <details key={brand} className="relative">
+        <details key={brand} className="relative" onMouseLeave={(e) => { (e.currentTarget as HTMLDetailsElement).open = false; }}>
+
                 <summary className="px-3 py-1 rounded-md hover:bg-primary-light cursor-pointer">
                   {brand}
                 </summary>
