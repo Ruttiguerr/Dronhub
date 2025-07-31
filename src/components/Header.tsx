@@ -44,8 +44,20 @@ const Header: React.FC = () => {
           <nav className="hidden md:flex items-center space-x-4">
           {/* Brand dropdowns */}
             {Object.entries(brandGroups).map(([brand, list]) => (
-        <details key={brand} className="relative" onMouseLeave={(e) => { (e.currentTarget as HTMLDetailsElement).open = false; }}>
-
+              <details
+                key={brand}
+                className="relative"
+                // Open the dropdown when the mouse enters the button or the list
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLDetailsElement).open = true;
+                }}
+                // Make the element focusable so that blur events fire when clicking outside
+                tabIndex={0}
+                // Close the dropdown when focus is lost (i.e. user clicks elsewhere)
+                onBlur={(e) => {
+                  (e.currentTarget as HTMLDetailsElement).open = false;
+                }}
+              >
                 <summary className="px-3 py-1 rounded-md hover:bg-primary-light cursor-pointer">
                   {brand}
                 </summary>
@@ -55,6 +67,11 @@ const Header: React.FC = () => {
                       key={drone.id}
                       to={`/drone/${drone.id}`}
                       className="block px-4 py-2 hover:bg-gray-100"
+                      // Close the dropdown when an option is clicked
+                      onClick={(e) => {
+                        const detailsEl = (e.currentTarget as HTMLElement).closest('details') as HTMLDetailsElement;
+                        if (detailsEl) detailsEl.open = false;
+                      }}
                     >
                       {drone.name}
                     </Link>
