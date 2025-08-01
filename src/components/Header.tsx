@@ -19,6 +19,8 @@ const Header: React.FC = () => {
   const { selected } = useComparison();
   const [drones, setDrones] = useState<Drone[]>([]);
   const [menuOpen, setMenuOpen] = useState(false);
+  // Track which brand dropdown is currently open to ensure only one at a time
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   useEffect(() => {
     // Load drones for dropdown menus
@@ -44,40 +46,30 @@ const Header: React.FC = () => {
           <nav className="hidden md:flex items-center space-x-4">
           {/* Brand dropdowns */}
             {Object.entries(brandGroups).map(([brand, list]) => (
-              <details
+              <div
                 key={brand}
                 className="relative"
-                // Open the dropdown when the mouse enters the button or the list
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLDetailsElement).open = true;
-                }}
-                // Make the element focusable so that blur events fire when clicking outside
-                tabIndex={0}
-                // Close the dropdown when focus is lost (i.e. user clicks elsewhere)
-                onBlur={(e) => {
-                  (e.currentTarget as HTMLDetailsElement).open = false;
-                }}
+                onMouseEnter={() => setOpenDropdown(brand)}
+                onMouseLeave={() => setOpenDropdown(null)}
               >
-                <summary className="px-3 py-1 rounded-md hover:bg-primary-light cursor-pointer">
+                <button className="px-3 py-1 rounded-md hover:bg-primary-light cursor-pointer focus:outline-none">
                   {brand}
-                </summary>
-                <div className="absolute mt-2 bg-white text-gray-800 rounded-md shadow-md py-1 w-48 z-50">
-                  {list.map((drone) => (
-                    <Link
-                      key={drone.id}
-                      to={`/drone/${drone.id}`}
-                      className="block px-4 py-2 hover:bg-gray-100"
-                      // Close the dropdown when an option is clicked
-                      onClick={(e) => {
-                        const detailsEl = (e.currentTarget as HTMLElement).closest('details') as HTMLDetailsElement;
-                        if (detailsEl) detailsEl.open = false;
-                      }}
-                    >
-                      {drone.name}
-                    </Link>
-                  ))}
-                </div>
-              </details>
+                </button>
+                {openDropdown === brand && (
+                  <div className="absolute mt-2 bg-white text-gray-800 rounded-md shadow-md py-1 w-48 z-50">
+                    {list.map((drone) => (
+                      <Link
+                        key={drone.id}
+                        to={`/drone/${drone.id}`}
+                        className="block px-4 py-2 hover:bg-gray-100"
+                        onClick={() => setOpenDropdown(null)}
+                      >
+                        {drone.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
             <Link to="/compare" className="px-3 py-1 rounded-md hover:bg-primary-light relative">
               {t('app.compare')}
